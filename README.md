@@ -1,29 +1,92 @@
-# AI Expense Tracker
 
-## Project Structure
-- `backend/`: Express.js server with MongoDB.
-- `frontend/`: Next.js application with Tailwind CSS.
+<div align="center">
+  <img src="assets/logo.png" alt="KharchaBuddy Logo" width="120" />
+  <h1>KharchaBuddy</h1>
+  <p><strong>Smart Personal Finance Management Powered by AI</strong></p>
+  
+  <p>
+    <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" /></a>
+    <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-3.4-blue?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS" /></a>
+    <a href="https://nodejs.org"><img src="https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js" alt="Node.js" /></a>
+    <a href="https://mongodb.com"><img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb" alt="MongoDB" /></a>
+  </p>
+</div>
 
-## How to Run
+<br />
 
-### prerequisites
-- Node.js installed.
-- MongoDB running locally (default: `mongodb://localhost:27017`).
+> **KharchaBuddy** is a modern, AI-driven financial tracking application designed to help you take control of your expenses with ease. Featuring interactive dashboards, real-time analytics, and intelligent categorization.
 
-### 1. Start the Backend
-Open a terminal and run:
-```bash
-cd backend
-npm install # Only first time
-node index.js
-```
-The server will run on `http://localhost:5000`.
+---
 
-### 2. Start the Frontend
-Open a **new** terminal and run:
-```bash
-cd frontend
-npm install # Only first time
-npm run dev
-```
-The application will run on `http://localhost:3000`.
+## 📸 Dashboard & Analytics
+
+### Monthly Expense Trend
+Visualize your spending habits with our interactive Annual and Monthly trend graphs.
+
+![Monthly Expense Trend](assets/analytics-dashboard.png)
+
+---
+
+## ✨ Key Features
+
+- **🤖 AI-Powered Insights**: Smart categorization and spending analysis.
+- **📊 Interactive Analytics**: Beautiful charts for monthly trends, category breakdowns, and more.
+- **🔐 Secure Authentication**: Robust user management with JWT and secure password hashing.
+- **📱 Responsive Design**: Fully optimized for desktop, tablet, and mobile devices.
+- **🌙 Dark Mode**: Sleek, modern dark-themed UI for comfortable viewing.
+- **⚡ Real-time Updates**: Instant reflection of new expenses and budget adjustments.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js (App Router), React, Tailwind CSS, Recharts, Lucide Icons
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB Atlas
+- **Authentication**: JWT (JSON Web Tokens)
+
+## 🚀 Getting Started
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/SameerMahato/KharchaBuddy.git
+    cd KharchaBuddy
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    # Install backend dependencies
+    cd backend
+    npm install
+
+    # Install frontend dependencies
+    cd ../frontend
+    npm install
+    ```
+
+3.  **Environment Setup**
+    Create a `.env` file in the `backend` directory:
+    ```env
+    MONGO_URI=your_mongodb_connection_string
+    JWT_SECRET=your_jwt_secret
+    PORT=5000
+    ```
+
+4.  **Run the Application**
+    ```bash
+    # Run Backend
+    cd backend
+    node index.js
+
+    # Run Frontend (in a new terminal)
+    cd frontend
+    npm run dev
+    ```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+<div align="center">
+  <p>Made with ❤️ by Sameer Mahato</p>
+</div>
