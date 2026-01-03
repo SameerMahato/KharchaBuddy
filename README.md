@@ -1,8 +1,8 @@
 
 <div align="center">
-  <img src="assets/logo.png" alt="KharchaBuddy Logo" width="120" />
-  <h1>KharchaBuddy</h1>
-  <p><strong>Smart Personal Finance Management Powered by AI</strong></p>
+  <img src="assets/banner.png" alt="KharchaBuddy Banner" width="100%" style="max-width: 500px;" />
+  
+  <br /><br />
   
   <p>
     <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" /></a>
@@ -23,7 +23,7 @@
 ### Monthly Expense Trend
 Visualize your spending habits with our interactive Annual and Monthly trend graphs.
 
-![Monthly Expense Trend](assets/analytics-dashboard.png)
+*(Trend graph visualization available in the application)*
 
 ---
 
