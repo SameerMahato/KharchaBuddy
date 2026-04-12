@@ -22,6 +22,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ai', require('./src/routes/aiRoutes'));
+app.use('/api/ai-cfo', require('./src/routes/aiCFORoutes'));
 app.use('/api/analytics', require('./src/routes/analyticsRoutes'));
 app.use('/api/budgets', require('./src/routes/budgetRoutes'));
 app.use('/api/export', require('./src/routes/exportRoutes'));

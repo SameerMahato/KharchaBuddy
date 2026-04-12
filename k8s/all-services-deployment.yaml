@@ -1,0 +1,211 @@
+# Social Finance Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social-finance
+  namespace: kharchabuddy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: social-finance
+  template:
+    metadata:
+      labels:
+        app: social-finance
+    spec:
+      containers:
+      - name: social-finance
+        image: kharchabuddy/social-finance:latest
+        ports:
+        - containerPort: 3006
+        env:
+        - name: PORT
+          value: "3006"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: mongodb-uri
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: social-finance
+  namespace: kharchabuddy
+spec:
+  selector:
+    app: social-finance
+  ports:
+  - port: 3006
+    targetPort: 3006
+---
+# Wealth Builder Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wealth-builder
+  namespace: kharchabuddy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wealth-builder
+  template:
+    metadata:
+      labels:
+        app: wealth-builder
+    spec:
+      containers:
+      - name: wealth-builder
+        image: kharchabuddy/wealth-builder:latest
+        ports:
+        - containerPort: 3007
+        env:
+        - name: PORT
+          value: "3007"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: mongodb-uri
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wealth-builder
+  namespace: kharchabuddy
+spec:
+  selector:
+    app: wealth-builder
+  ports:
+  - port: 3007
+    targetPort: 3007
+---
+# Tax Optimizer Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tax-optimizer
+  namespace: kharchabuddy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tax-optimizer
+  template:
+    metadata:
+      labels:
+        app: tax-optimizer
+    spec:
+      containers:
+      - name: tax-optimizer
+        image: kharchabuddy/tax-optimizer:latest
+        ports:
+        - containerPort: 3008
+        env:
+        - name: PORT
+          value: "3008"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: mongodb-uri
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tax-optimizer
+  namespace: kharchabuddy
+spec:
+  selector:
+    app: tax-optimizer
+  ports:
+  - port: 3008
+    targetPort: 3008
+---
+# Integration Service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-service
+  namespace: kharchabuddy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: integration-service
+  template:
+    metadata:
+      labels:
+        app: integration-service
+    spec:
+      containers:
+      - name: integration-service
+        image: kharchabuddy/integration-service:latest
+        ports:
+        - containerPort: 3009
+        env:
+        - name: PORT
+          value: "3009"
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: mongodb-uri
+        - name: SETU_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: setu-api-key
+        - name: FINBOX_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kharchabuddy-secrets
+              key: finbox-api-key
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integration-service
+  namespace: kharchabuddy
+spec:
+  selector:
+    app: integration-service
+  ports:
+  - port: 3009
+    targetPort: 3009

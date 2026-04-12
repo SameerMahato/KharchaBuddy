@@ -1,0 +1,159 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.kharchabuddy.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push images to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker-compose build
+          docker-compose push
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster kharchabuddy-staging --service auth-service --force-new-deployment
+          aws ecs update-service --cluster kharchabuddy-staging --service expense-service --force-new-deployment
+          aws ecs update-service --cluster kharchabuddy-staging --service budget-service --force-new-deployment
+          aws ecs update-service --cluster kharchabuddy-staging --service ai-cfo-service --force-new-deployment
+          aws ecs update-service --cluster kharchabuddy-staging --service prediction-engine --force-new-deployment
+
+      - name: Run database migrations
+        run: |
+          npm run migrate:up
+        working-directory: ./services
+        env:
+          MONGO_URI: ${{ secrets.STAGING_MONGO_URI }}
+          TIMESCALE_URI: ${{ secrets.STAGING_TIMESCALE_URI }}
+
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Staging deployment completed'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://kharchabuddy.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push images to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          docker-compose build
+          docker-compose push
+
+      - name: Create backup
+        run: |
+          aws ecs run-task --cluster kharchabuddy-production --task-definition backup-task
+
+      - name: Deploy to ECS with blue-green
+        run: |
+          aws ecs update-service --cluster kharchabuddy-production --service auth-service --force-new-deployment --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
+          aws ecs update-service --cluster kharchabuddy-production --service expense-service --force-new-deployment --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
+          aws ecs update-service --cluster kharchabuddy-production --service budget-service --force-new-deployment --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
+          aws ecs update-service --cluster kharchabuddy-production --service ai-cfo-service --force-new-deployment --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
+          aws ecs update-service --cluster kharchabuddy-production --service prediction-engine --force-new-deployment --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100"
+
+      - name: Wait for deployment to stabilize
+        run: |
+          aws ecs wait services-stable --cluster kharchabuddy-production --services auth-service expense-service budget-service ai-cfo-service prediction-engine
+
+      - name: Run database migrations
+        run: |
+          npm run migrate:up
+        working-directory: ./services
+        env:
+          MONGO_URI: ${{ secrets.PRODUCTION_MONGO_URI }}
+          TIMESCALE_URI: ${{ secrets.PRODUCTION_TIMESCALE_URI }}
+
+      - name: Run smoke tests
+        run: |
+          npm run test:smoke
+        working-directory: ./services
+        env:
+          API_BASE_URL: https://api.kharchabuddy.com
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment completed'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+      - name: Notify Sentry
+        run: |
+          curl -X POST https://sentry.io/api/0/organizations/${{ secrets.SENTRY_ORG }}/releases/ \
+            -H "Authorization: Bearer ${{ secrets.SENTRY_AUTH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"version\": \"${{ github.ref_name }}\", \"projects\": [\"kharchabuddy\"]}"

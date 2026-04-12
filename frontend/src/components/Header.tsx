@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { LogOut, User } from 'lucide-react';
+import NotificationCenter from './NotificationCenter';
 
 const Header = () => {
     const { user, logout } = useAuth();
@@ -23,6 +24,9 @@ const Header = () => {
                         <ul className="flex items-center space-x-4">
                             {user ? (
                                 <>
+                                    <li>
+                                        <NotificationCenter />
+                                    </li>
                                     <li className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
                                         <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
                                             <User className="w-4 h-4 text-indigo-400" />

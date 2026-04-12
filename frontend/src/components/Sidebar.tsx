@@ -9,6 +9,11 @@ import {
     Receipt,
     TrendingUp,
     X,
+    Bot,
+    Target,
+    Users,
+    FileText,
+    GitBranch,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -24,8 +29,13 @@ const Sidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
+        { icon: Bot, label: 'AI CFO', href: '/dashboard/ai-cfo' },
         { icon: Receipt, label: 'Expenses', href: '/dashboard/expenses' },
-        { icon: Wallet, label: 'Budgets & Loans', href: '/dashboard/budgets' },
+        { icon: Wallet, label: 'Budgets', href: '/dashboard/budgets' },
+        { icon: Target, label: 'Goals', href: '/dashboard/goals' },
+        { icon: Users, label: 'Lending', href: '/dashboard/lending' },
+        { icon: FileText, label: 'Tax', href: '/dashboard/tax' },
+        { icon: GitBranch, label: 'Scenarios', href: '/dashboard/scenarios' },
         { icon: TrendingUp, label: 'Analytics', href: '/dashboard/analytics' },
     ];
 

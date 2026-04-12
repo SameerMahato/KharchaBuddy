@@ -1,0 +1,82 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'kharchabuddy'
+    environment: 'development'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Backend services
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['auth-service:3000']
+    metrics_path: '/metrics'
+
+  - job_name: 'expense-service'
+    static_configs:
+      - targets: ['expense-service:3001']
+    metrics_path: '/metrics'
+
+  - job_name: 'budget-service'
+    static_configs:
+      - targets: ['budget-service:3002']
+    metrics_path: '/metrics'
+
+  - job_name: 'ai-cfo-service'
+    static_configs:
+      - targets: ['ai-cfo-service:3003']
+    metrics_path: '/metrics'
+
+  - job_name: 'prediction-engine'
+    static_configs:
+      - targets: ['prediction-engine:3004']
+    metrics_path: '/metrics'
+
+  - job_name: 'social-finance-service'
+    static_configs:
+      - targets: ['social-finance-service:3005']
+    metrics_path: '/metrics'
+
+  - job_name: 'wealth-builder-service'
+    static_configs:
+      - targets: ['wealth-builder-service:3006']
+    metrics_path: '/metrics'
+
+  - job_name: 'tax-optimizer-service'
+    static_configs:
+      - targets: ['tax-optimizer-service:3007']
+    metrics_path: '/metrics'
+
+  - job_name: 'integration-service'
+    static_configs:
+      - targets: ['integration-service:3008']
+    metrics_path: '/metrics'
+
+  # Infrastructure
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
